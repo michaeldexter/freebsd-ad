@@ -1,4 +1,6 @@
 #!/bin/sh
+
+# Copyright 2021 Michael Dexter. All rights reserved
  
 which samba || \
 { echo Samba missing - pkg install samba413 ldb22 bind-tools ; exit 1 ; }
