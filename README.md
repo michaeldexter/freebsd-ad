@@ -2,9 +2,13 @@
 
 This script has been tested with the following package versions:
 
-pkg install samba413 ldb22 bind-tools
+pkg install samba413 samba416 samba419
 
-The script will ask for the basic parameters and report the results and several diagnostics and configuration examples
+Read this script to see what it is doing before running it.
+
+It is best run on a fresh jail or virtual machine.
+
+The script will ask for the basic parameters and report the results and several diagnostic and configuration examples
 
 bind-tools is optional but is suggested for nslookup
 
