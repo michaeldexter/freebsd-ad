@@ -31,22 +31,27 @@ echo ; echo Removing previous certificates
 [ -f /var/db/samba4/private/tls/cert.pem ] && \
 	rm /var/db/samba4/private/tls/cert.pem
 
-echo ; echo Enter a domain such as DC:
-read domain
-
-echo ; echo Enter a realm such as MYDOMAIN.LOCAL:
+echo ; echo Enter a realm such as MYDOMAIN.MYCOMPANY.LOCAL:
 read realm
 
-echo ; echo Enter a strong administraor password \(will echo and be tested\)
+echo ; echo Enter a domain such as MYDOMAIN:
+read domain
+
+echo ; echo Enter a strong administrator password \(will echo and be tested\)
 read adminpass
 
 echo ; echo Provisioning with samba-tool domain provision --use-rfc2307 \
-	 --realm=${domain}.$realm --domain=$domain \
-	 --server-role=dc --adminpass $adminpass
+	--realm=${domain}.$realm --domain=$domain \
+	--server-role=dc --adminpass $adminpass \
+	--option="ad dc functional level = 2016"
+# --functional-level=2016
 
 samba-tool domain provision --use-rfc2307 \
-         --realm=${domain}.$realm --domain=$domain \
-         --server-role=dc --adminpass $adminpass
+	--realm=${domain}.$realm --domain=$domain \
+	--server-role=dc --adminpass $adminpass \
+	--option="ad dc functional level = 2016"
+# --functional-level=2016
+#samba-tool domain provision: error: no such option: --functional-level
 
 # Alternative flags to consider
 # --dns-backend=BIND9_DLZ \
@@ -124,8 +129,11 @@ echo ; echo Generating a resolv.conf that points at 127.0.0.1 and 8.8.8.8
 echo nameserver 127.0.0.1 > /etc/resolv.conf
 echo nameserver 8.8.8.8 >> /etc/resolv.conf
 
-echo /etc/resolv.conf reads
+echo ; echo /etc/resolv.conf reads
 cat /etc/resolv.conf
+
+echo
+samba-tool domain level show
 
 echo
 echo From here temporarily enable samba_server with:
@@ -133,6 +141,7 @@ echo
 echo service samba_server onestart
 echo
 echo Various test and configuration tools:
+echo getaddrinfo MYDOMAIN.MYCOMPANY.LOCAL
 echo samba-tool dns query localhost ${domain}.${realm} @ ALL -U administrator
 echo samba-tool fsmo show
 echo samba_dnsupdate --verbose --all-names
@@ -144,12 +153,14 @@ echo samba-tool user create testuser
 echo wbinfo -i testuser
 echo wbinfo --name-to-sid testuser
 echo smbclient -L //localhost -U testuser
+echo net ads status -U testuser
 echo wbinfo -t
 echo samba-ldbedit...
 echo samba-tool user list
 echo samba-tool dbcheck
 echo testparm -s
 echo smbd -b
+samba-tool drs showrepl
 echo
 
 exit 0
